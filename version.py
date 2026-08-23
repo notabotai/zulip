@@ -49,3 +49,5 @@ API_FEATURE_LEVEL = 500
 #   minor version bump suffices.
 
 PROVISION_VERSION = (379, 0)  # bumped 2026-05-12 to upgrade Python requirements
+
+# notabot fork — nbchat deploy pipeline e2e test (do not remove)
