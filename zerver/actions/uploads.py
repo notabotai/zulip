@@ -38,7 +38,9 @@ def notify_attachment_update(
 
 
 def do_claim_attachments(
-    message: Message | ScheduledMessage, potential_path_ids: list[str]
+    message: Message | ScheduledMessage,
+    potential_path_ids: list[str],
+    forwarder_user_profile: UserProfile | None = None,
 ) -> bool:
     claimed = False
     for path_id in potential_path_ids:
@@ -58,7 +60,21 @@ def do_claim_attachments(
                 user_profile.realm.web_public_streams_enabled() and stream.is_web_public
             )
 
-        if not validate_attachment_request(user_profile, path_id)[0]:
+        is_valid, attachment_to_claim = validate_attachment_request(user_profile, path_id)
+        if not is_valid and not (
+            # Broaden ONLY the claim decision (never the download-access
+            # gate) for mirror/forged sends: allow claiming an upload that
+            # is genuinely owned by the authenticated forwarder who actually
+            # performed the upload. This is what lets a WhatsApp->Zulip
+            # mirror bot (forwarder) attach its own uploads to messages it
+            # forges on behalf of realm members, including into private
+            # channels where message.sender (the member) is not the owner
+            # and cannot be rescued by the is_realm_public bootstrap.
+            forwarder_user_profile is not None
+            and attachment_to_claim is not None
+            and attachment_to_claim.owner_id == forwarder_user_profile.id
+            and forwarder_user_profile.can_forge_sender
+        ):
             # Technically, there are 2 cases here:
             # * The user put something in their message that has the form
             # of an upload URL, but does not actually correspond to a previously

@@ -185,6 +185,11 @@ class SendMessageRequest:
     recipients_for_user_creation_events: dict[UserProfile, set[int]] | None = None
     reminder_target_message_id: int | None = None
     reminder_note: str | None = None
+    # For mirror/forged sends, the authenticated user that actually
+    # performed the request (and thus may own uploads referenced by the
+    # forged message, even though message.sender is the forged member).
+    # Only consulted to broaden attachment *claiming*, never downloads.
+    forwarder_user_profile: UserProfile | None = None
 
 
 @dataclass

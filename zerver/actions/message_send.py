@@ -950,7 +950,9 @@ def do_send_messages(
     # Claim attachments in message
     for send_request in send_message_requests:
         if do_claim_attachments(
-            send_request.message, send_request.rendering_result.potential_attachment_path_ids
+            send_request.message,
+            send_request.rendering_result.potential_attachment_path_ids,
+            forwarder_user_profile=send_request.forwarder_user_profile,
         ):
             send_request.message.has_attachment = True
             update_fields = ["has_attachment"]
@@ -1917,6 +1919,11 @@ def check_message(
         acting_user=acting_user,
         no_previews=no_previews,
     )
+    # Remember the authenticated forwarder (for mirror/forged sends) so
+    # do_send_messages can let it claim uploads it genuinely owns.  This is
+    # only ever set for the send path; message-edit and scheduled-message
+    # paths have no forwarder and leave this None.
+    message_send_dict.forwarder_user_profile = forwarder_user_profile
 
     if (
         stream is not None

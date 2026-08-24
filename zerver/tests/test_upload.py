@@ -21,11 +21,12 @@ import zerver.lib.upload
 from analytics.models import RealmCount
 from zerver.actions.create_realm import do_create_realm
 from zerver.actions.create_user import do_create_user
-from zerver.actions.message_send import internal_send_private_message
+from zerver.actions.message_send import check_send_message, internal_send_private_message
 from zerver.actions.realm_icon import do_change_icon_source
 from zerver.actions.realm_logo import do_change_logo_source
 from zerver.actions.realm_settings import do_change_realm_plan_type, do_set_realm_property
 from zerver.actions.user_settings import do_scrub_avatar_images
+from zerver.actions.users import do_change_can_forge_sender
 from zerver.lib.attachments import validate_attachment_request
 from zerver.lib.avatar import (
     DEFAULT_AVATAR_FILE,
@@ -50,6 +51,7 @@ from zerver.lib.upload.base import ZulipUploadBackend
 from zerver.lib.upload.local import LocalUploadBackend
 from zerver.lib.upload.s3 import S3UploadBackend
 from zerver.models import Attachment, Message, OnboardingStep, Realm, RealmDomain, UserProfile
+from zerver.models.clients import get_client
 from zerver.models.realms import get_realm
 from zerver.models.users import get_system_bot, get_user_by_delivery_email
 
@@ -636,6 +638,83 @@ class FileUploadTest(UploadSerializeMixin, ZulipTestCase):
         self.assertEqual(Attachment.objects.get(path_id=d1_path_id).messages.count(), 4)
         self.assertTrue(Attachment.objects.get(path_id=d1_path_id).is_realm_public)
         self.assertTrue(Attachment.objects.get(path_id=d1_path_id).is_web_public)
+
+    def test_forged_mirror_message_claims_forwarder_owned_attachment(self) -> None:
+        """A mirror bot (the forwarder, holding can_forge_sender) uploads media
+        that it owns, then forges a channel message *as a realm member*, linking
+        that upload -- exactly how the WhatsApp->Zulip mirror works.  The forged
+        message's sender (the member) is not the attachment's owner and, for a
+        private (invite-only) channel, cannot be rescued by the is_realm_public
+        bootstrap, so historically the upload was never claimed and every channel
+        subscriber got a 403 downloading it.  With the fix, the forwarder's
+        genuine ownership is consulted for the *claim* decision only, so the
+        attachment links to the message and the channel's subscribers get normal
+        per-channel download access via the unchanged message-based path.
+        """
+        realm = get_realm("zulip")
+        # The forged sender: an ordinary realm member.
+        member = self.example_user("cordelia")
+        # A second subscriber who neither uploaded nor sent the message; proves
+        # access is granted via the normal channel-subscription path, not
+        # ownership and not because they are the forged sender.
+        subscriber = self.example_user("hamlet")
+
+        # The mirror bot: authenticated uploader and forwarder, with forge rights.
+        mirror_bot = self.create_test_bot(
+            "mirror", self.example_user("iago"), full_name="Mirror Bot"
+        )
+        do_change_can_forge_sender(mirror_bot, True)
+
+        # A private (invite-only) mirror channel that member and subscriber share.
+        self.make_stream("mirror-private", realm=realm, invite_only=True)
+        self.subscribe(member, "mirror-private")
+        self.subscribe(subscriber, "mirror-private")
+
+        # The bot uploads the media -> Attachment.owner is the bot, not the member.
+        url, _ = upload_message_attachment(
+            "media.txt", "text/plain", b"mirror-media", mirror_bot
+        )
+        path_id = url.removeprefix("/user_uploads/")
+        attachment = Attachment.objects.get(path_id=path_id)
+        self.assertEqual(attachment.owner_id, mirror_bot.id)
+        self.assertEqual(attachment.messages.count(), 0)
+
+        # The bot forges a channel message *as the member*, linking the upload.
+        body = f"[media.txt](http://{realm.host}/user_uploads/{path_id})"
+        check_send_message(
+            member,
+            get_client("jabber_mirror"),
+            "stream",
+            ["mirror-private"],
+            "whatsapp",
+            body,
+            forged=True,
+            forwarder_user_profile=mirror_bot,
+            realm=realm,
+        )
+
+        # Fix: the bot-owned upload is now claimed by the forged message.
+        attachment.refresh_from_db()
+        self.assertEqual(attachment.messages.count(), 1)
+        message = attachment.messages.get()
+        self.assertTrue(message.has_attachment)
+        self.assertEqual(message.sender_id, member.id)
+        # Claiming into a private channel must NOT over-share the file.
+        self.assertFalse(attachment.is_realm_public)
+        self.assertFalse(attachment.is_web_public)
+
+        # A different channel subscriber (not owner, not sender) can now download
+        # the file, via the normal message-based authorization path.
+        self.login_user(subscriber)
+        response = self.client_get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.getvalue(), b"mirror-media")
+
+        # And download authorization itself is unchanged: a realm member who is
+        # NOT subscribed to the private channel is still denied (403).
+        self.login_user(self.example_user("othello"))
+        response = self.client_get(url)
+        self.assertEqual(response.status_code, 403)
 
     def test_check_attachment_reference_update(self) -> None:
         f1 = StringIO("file1")
