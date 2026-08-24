@@ -954,6 +954,7 @@ export function dispatch_normal_event(event) {
                 "fluid_layout_width",
                 "hide_ai_features",
                 "high_contrast_mode",
+                "nb_modern_theme",
                 "receives_typing_notifications",
                 "resolved_topic_notice_auto_read_policy",
                 "starred_message_counts",
@@ -1010,6 +1011,9 @@ export function dispatch_normal_event(event) {
             }
             if (event.property === "high_contrast_mode") {
                 $("body").toggleClass("high-contrast", event.value);
+            }
+            if (event.property === "nb_modern_theme") {
+                $("body").toggleClass("nb-modern", event.value);
             }
             if (event.property === "demote_inactive_streams") {
                 stream_list_sort.set_filter_out_inactives();

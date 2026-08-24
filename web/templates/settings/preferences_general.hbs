@@ -51,6 +51,13 @@
     </div>
 
     {{> settings_checkbox
+      setting_name="nb_modern_theme"
+      is_checked=settings_object.nb_modern_theme
+      label=settings_label.nb_modern_theme
+      prefix=prefix
+      show_reset_button=for_realm_settings}}
+
+    {{> settings_checkbox
       setting_name="enter_sends"
       is_checked=settings_object.enter_sends
       label=settings_label.enter_sends

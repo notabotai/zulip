@@ -39,6 +39,7 @@ export const realm_default_settings_schema = z.object({
     fluid_layout_width: z.boolean(),
     hide_ai_features: z.boolean(),
     high_contrast_mode: z.boolean(),
+    nb_modern_theme: z.boolean(),
     left_side_userlist: z.boolean(),
     message_content_in_email_notifications: z.boolean(),
     notification_sound: z.string(),

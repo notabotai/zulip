@@ -1,0 +1,73 @@
+/* Not a Bot — "Modern" theme overlay.
+   Gated on body.nb-modern, toggled by the per-user `nb_modern_theme` setting.
+   Layers over BOTH light and dark themes (values use CSS light-dark()). */
+body.nb-modern{
+  --color-compose-send-button-background: hsl(178 52% 44%);
+  --color-compose-send-button-background-interactive: hsl(178 58% 36%);
+  --color-unread-marker: hsl(178 52% 44%);
+  --color-outline-focus: hsl(178 52% 44%);
+  --color-background: light-dark(hsl(220 20% 96%), hsl(222 16% 9%));
+  --color-border-sidebar: transparent;
+  --color-text-link: light-dark(hsl(185 60% 34%), hsl(180 72% 60%));
+}
+body.nb-modern #left-sidebar,
+body.nb-modern #right-sidebar{background:transparent !important;border:none !important;}
+body.nb-modern #message_feed_container,
+body.nb-modern .message-feed{background:light-dark(#ffffff,hsl(222 16% 12%)) !important;border:none !important;border-radius:16px;box-shadow:0 1px 3px hsl(220 25% 20% / 7%),0 10px 30px hsl(220 25% 20% / 7%);margin:8px 10px;}
+body.nb-modern .header,
+body.nb-modern .header-main{background:transparent !important;border:none !important;box-shadow:none !important;}
+body.nb-modern .message_row,
+body.nb-modern .messagebox-content,
+body.nb-modern .rendered_markdown{font-weight:350;letter-spacing:.1px;}
+body.nb-modern .messagebox-content{line-height:1.5;}
+body.nb-modern .sender_name,
+body.nb-modern .message_sender{font-weight:650 !important;}
+body.nb-modern .recipient_row{margin-top:22px;}
+body.nb-modern .messagebox{padding-block:6px;border-radius:12px;transition:background-color .12s ease;}
+body.nb-modern .message_row:hover .messagebox{background:light-dark(hsl(220 22% 97%),hsl(222 16% 16%));}
+body.nb-modern .message-avatar,
+body.nb-modern .inline_profile_picture,
+body.nb-modern td.message_row_avatar img{border-radius:50% !important;}
+body.nb-modern .narrow-filter,
+body.nb-modern #stream_filters li a,
+body.nb-modern .left-sidebar-navigation-list li a,
+body.nb-modern .top_left_row,
+body.nb-modern .bottom_left_row{border-radius:10px;padding-block:7px;margin:1px 6px;}
+body.nb-modern .active-filter{background:transparent !important;}
+body.nb-modern .active-filter>.bottom_left_row.channel-header,
+body.nb-modern .active-sub-filter,
+body.nb-modern .left-sidebar-navigation-list li.active-filter,
+body.nb-modern .left-sidebar-navigation-list a.active-filter{background:light-dark(hsl(178 52% 91%),hsl(178 45% 22%)) !important;color:light-dark(hsl(178 62% 25%),hsl(178 60% 78%)) !important;border-radius:10px !important;font-weight:600;}
+body.nb-modern .narrow-filter:hover,
+body.nb-modern #stream_filters li a:hover,
+body.nb-modern .left-sidebar-navigation-list li a:hover{background:light-dark(hsl(220 20% 93%),hsl(222 16% 16%)) !important;}
+body.nb-modern .unread_count.normal-count{background:hsl(178 52% 44%) !important;color:#fff !important;}
+body.nb-modern #compose,
+body.nb-modern .compose-box,
+body.nb-modern .message_comp{border:none !important;}
+body.nb-modern .message_comp{background:light-dark(#fff,hsl(222 16% 12%));box-shadow:0 2px 18px hsl(220 25% 20% / 11%);border-radius:16px;margin:0 10px 10px;}
+body.nb-modern #compose-textarea,
+body.nb-modern .search_input,
+body.nb-modern input.filter_text_input{border-radius:10px !important;}
+body.nb-modern .compose-send-button,
+body.nb-modern .send_message{border-radius:12px !important;}
+body.nb-modern .zulip-icon{font-weight:400;}
+body.nb-modern .compose_control_buttons_container .zulip-icon,
+body.nb-modern .message_comp .zulip-icon{font-size:16px;}
+body.nb-modern .top-navbar-buttons-wrapper .zulip-icon,
+body.nb-modern .navbar-icon,
+body.nb-modern #userlist-toggle .zulip-icon{font-size:17px;opacity:.85;}
+body.nb-modern input:focus-visible,
+body.nb-modern textarea:focus-visible,
+body.nb-modern button:focus-visible,
+body.nb-modern a:focus-visible{outline:2px solid hsl(178 52% 50%);outline-offset:2px;}
+body.nb-modern .narrow-filter,
+body.nb-modern #stream_filters li a,
+body.nb-modern .left-sidebar-navigation-list li a,
+body.nb-modern .messagebox,
+body.nb-modern button,
+body.nb-modern .zulip-icon,
+body.nb-modern .compose-send-button,
+body.nb-modern .bottom_left_row{transition:background-color .13s ease,color .13s ease,box-shadow .13s ease,transform .13s ease,opacity .13s ease;}
+body.nb-modern .compose-send-button:hover,
+body.nb-modern .send_message:hover{transform:translateY(-1px);}

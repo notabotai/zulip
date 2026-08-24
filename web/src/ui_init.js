@@ -333,6 +333,9 @@ export function initialize_kitchen_sink_stuff() {
     if (user_settings.high_contrast_mode) {
         $("body").addClass("high-contrast");
     }
+    if (user_settings.nb_modern_theme) {
+        $("body").addClass("nb-modern");
+    }
 
     $(window).on("blur", () => {
         $(document.body).addClass("window_blurred");

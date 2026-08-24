@@ -316,6 +316,7 @@ def json_change_settings(
     fluid_layout_width: Json[bool] | None = None,
     full_name: str | None = None,
     high_contrast_mode: Json[bool] | None = None,
+    nb_modern_theme: Json[bool] | None = None,
     hide_ai_features: Json[bool] | None = None,
     left_side_userlist: Json[bool] | None = None,
     message_content_in_email_notifications: Json[bool] | None = None,
