@@ -92,3 +92,12 @@ body.nb-modern .compose-send-button,
 body.nb-modern .bottom_left_row{transition:background-color .13s ease,color .13s ease,box-shadow .13s ease,transform .13s ease,opacity .13s ease;}
 body.nb-modern .compose-send-button:hover,
 body.nb-modern .send_message:hover{transform:translateY(-1px);}
+
+/* VIEWS nav list: move the pill onto the <li> so the row and its hover ⋮ menu
+   icon (a sibling of the <a>) share one aligned box — fixes the hover jank. */
+body.nb-modern .left-sidebar-navigation-list li{margin:1px var(--nb-gap);border-radius:var(--nb-radius);}
+body.nb-modern .left-sidebar-navigation-list li > a{margin:0 !important;border-radius:0 !important;background:transparent !important;}
+body.nb-modern .left-sidebar-navigation-list li:hover{background:light-dark(hsl(220 20% 93%),hsl(222 16% 16%));}
+body.nb-modern .left-sidebar-navigation-list li.active-filter{background:light-dark(hsl(178 52% 91%),hsl(178 45% 22%)) !important;}
+body.nb-modern .left-sidebar-navigation-list li.active-filter > a{color:light-dark(hsl(178 62% 25%),hsl(178 60% 78%)) !important;font-weight:600;}
+body.nb-modern .left-sidebar-navigation-list .sidebar-menu-icon{align-self:center;}
