@@ -208,7 +208,7 @@ def confirm_email_change(request: HttpRequest, *, key: str) -> HttpResponse:
 
 emojiset_choices = {emojiset["key"] for emojiset in UserProfile.emojiset_choices()}
 web_home_view_options = ["recent", "inbox", "all_messages"]
-nb_theme_options = ["classic", "animals", "modern"]
+nb_theme_options = ["classic", "animals"]
 web_animate_image_previews_options = ["always", "on_hover", "never"]
 
 

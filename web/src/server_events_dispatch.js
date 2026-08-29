@@ -1013,12 +1013,7 @@ export function dispatch_normal_event(event) {
                 $("body").toggleClass("high-contrast", event.value);
             }
             if (event.property === "nb_theme") {
-                $("body").removeClass("nb-modern nb-animals");
-                if (event.value === "modern") {
-                    $("body").addClass("nb-modern");
-                } else if (event.value === "animals") {
-                    $("body").addClass("nb-animals");
-                }
+                $("body").toggleClass("nb-animals", event.value === "animals");
             }
             if (event.property === "demote_inactive_streams") {
                 stream_list_sort.set_filter_out_inactives();

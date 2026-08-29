@@ -57,7 +57,7 @@ export const user_settings_schema = z.object({
     fluid_layout_width: z.boolean(),
     hide_ai_features: z.boolean(),
     high_contrast_mode: z.boolean(),
-    nb_theme: z.enum(["classic", "animals", "modern"]),
+    nb_theme: z.enum(["classic", "animals"]),
     left_side_userlist: z.boolean(),
     message_content_in_email_notifications: z.boolean(),
     notification_sound: z.string(),
