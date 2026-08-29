@@ -333,8 +333,11 @@ export function initialize_kitchen_sink_stuff() {
     if (user_settings.high_contrast_mode) {
         $("body").addClass("high-contrast");
     }
-    if (user_settings.nb_modern_theme) {
+    $("body").removeClass("nb-modern nb-animals");
+    if (user_settings.nb_theme === "modern") {
         $("body").addClass("nb-modern");
+    } else if (user_settings.nb_theme === "animals") {
+        $("body").addClass("nb-animals");
     }
 
     $(window).on("blur", () => {

@@ -73,7 +73,7 @@ class UserBaseSettings(models.Model):
     web_escape_navigates_to_home_view = models.BooleanField(default=True)
     fluid_layout_width = models.BooleanField(default=False)
     high_contrast_mode = models.BooleanField(default=False)
-    nb_modern_theme = models.BooleanField(default=False)
+    nb_theme = models.TextField(default="animals")
     translate_emoticons = models.BooleanField(default=False)
     display_emoji_reaction_users = models.BooleanField(default=True)
     twenty_four_hour_time = models.BooleanField(default=False)
@@ -370,7 +370,7 @@ class UserBaseSettings(models.Model):
         fluid_layout_width=bool,
         hide_ai_features=bool,
         high_contrast_mode=bool,
-        nb_modern_theme=bool,
+        nb_theme=str,
         left_side_userlist=bool,
         receives_typing_notifications=bool,
         resolved_topic_notice_auto_read_policy=ResolvedTopicNoticeAutoReadPolicyEnum,

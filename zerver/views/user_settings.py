@@ -208,6 +208,7 @@ def confirm_email_change(request: HttpRequest, *, key: str) -> HttpResponse:
 
 emojiset_choices = {emojiset["key"] for emojiset in UserProfile.emojiset_choices()}
 web_home_view_options = ["recent", "inbox", "all_messages"]
+nb_theme_options = ["classic", "animals", "modern"]
 web_animate_image_previews_options = ["always", "on_hover", "never"]
 
 
@@ -316,7 +317,7 @@ def json_change_settings(
     fluid_layout_width: Json[bool] | None = None,
     full_name: str | None = None,
     high_contrast_mode: Json[bool] | None = None,
-    nb_modern_theme: Json[bool] | None = None,
+    nb_theme: Annotated[str, check_string_in_validator(nb_theme_options)] | None = None,
     hide_ai_features: Json[bool] | None = None,
     left_side_userlist: Json[bool] | None = None,
     message_content_in_email_notifications: Json[bool] | None = None,

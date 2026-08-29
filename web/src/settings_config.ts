@@ -676,7 +676,6 @@ export const preferences_settings_labels = {
     fluid_layout_width: $t({defaultMessage: "Use full width on wide screens"}),
     hide_ai_features: $t({defaultMessage: "Hide AI features"}),
     high_contrast_mode: $t({defaultMessage: "High contrast mode"}),
-    nb_modern_theme: $t({defaultMessage: "Modern theme (Not a Bot)"}),
     enter_sends: new Handlebars.SafeString(
         $t_html({defaultMessage: "<kbd>Enter</kbd> sends when composing a message"}),
     ),
