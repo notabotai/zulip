@@ -132,7 +132,10 @@ def compute_irc_user_fullname(email: str) -> str:
 
 
 def compute_jabber_user_fullname(email: str) -> str:
-    return Address(addr_spec=email).username + " (XMPP)"
+    # Just the bare local part (e.g. a phone number): a mirror dummy's
+    # name is a placeholder that a later fill-in step replaces, and that
+    # step recognises placeholders by their being a bare number.
+    return Address(addr_spec=email).username
 
 
 def get_user_profile_delivery_email_cache_key(

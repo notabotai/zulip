@@ -29,7 +29,7 @@ from zerver.lib.typed_endpoint import (
 )
 from zerver.lib.zcommand import process_zcommands
 from zerver.models import Client, Message, RealmDomain, UserProfile
-from zerver.models.users import get_user_including_cross_realm
+from zerver.models.users import get_system_bot, get_user_by_delivery_email, is_cross_realm_bot_email
 
 
 class InvalidMirrorInputError(Exception):
@@ -66,8 +66,16 @@ def create_mirrored_message_users(
     for email in referenced_users:
         create_mirror_user_if_needed(user_profile.realm, email, fullname_function)
 
-    sender_user_profile = get_user_including_cross_realm(sender_email, user_profile.realm)
-    return sender_user_profile
+    if is_cross_realm_bot_email(sender_email):
+        return get_system_bot(sender_email, user_profile.realm_id)
+    # Look the sender up by delivery email, exactly as
+    # create_mirror_user_if_needed found or created it above. Matching on
+    # .email (get_user) misses a new mirror dummy whenever the realm's
+    # default email_address_visibility masks .email as user<id>@<host>.
+    # The delivery-email lookup is fine in this view: only mirroring
+    # clients get here, and user_check above has already confined
+    # sender_email to this realm's domains.
+    return get_user_by_delivery_email(sender_email, user_profile.realm)
 
 
 def same_realm_irc_user(user_profile: UserProfile, email: str) -> bool:

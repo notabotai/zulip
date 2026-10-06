@@ -1,14 +1,18 @@
 from typing import Any
 from unittest import mock
 
+import orjson
+from django.core import mail
 from django.db import IntegrityError
 from django.utils.timezone import now as timezone_now
 
 from zerver.actions.message_send import create_mirror_user_if_needed
+from zerver.actions.realm_settings import do_set_realm_user_default_setting
+from zerver.actions.users import do_change_can_forge_sender
 from zerver.lib.create_user import create_user_profile
 from zerver.lib.test_classes import ZulipTestCase
 from zerver.lib.test_helpers import reset_email_visibility_to_everyone_in_zulip_realm
-from zerver.models import UserProfile
+from zerver.models import RealmUserDefault, ScheduledEmail, UserProfile
 from zerver.models.clients import get_client
 from zerver.models.realms import get_realm
 from zerver.models.users import get_user
@@ -149,6 +153,61 @@ class MirroredMessageUsersTest(ZulipTestCase):
 
         bob = get_user(self.nonreg_email("bob"), sender.realm)
         self.assertTrue(bob.is_mirror_dummy)
+
+    def test_jabber_mirror_new_sender_with_masked_email_visibility(self) -> None:
+        """A forged jabber_mirror send from a never-seen address must succeed
+        even when the realm masks new users' .email, and every later send
+        from that address must reuse the one mirror dummy it created."""
+        realm = get_realm("zulip")
+        do_set_realm_user_default_setting(
+            RealmUserDefault.objects.get(realm=realm),
+            "email_address_visibility",
+            RealmUserDefault.EMAIL_ADDRESS_VISIBILITY_MODERATORS,
+            acting_user=None,
+        )
+        bot = self.create_test_bot("jabber", self.example_user("iago"))
+        do_change_can_forge_sender(bot, True)
+
+        sender_email = "918299339223@zulip.com"
+        self.assertFalse(
+            UserProfile.objects.filter(realm=realm, delivery_email__iexact=sender_email).exists()
+        )
+        outbox_before = len(mail.outbox)
+        scheduled_emails_before = ScheduledEmail.objects.count()
+
+        # Twice: the bug made the first send *and every later one* fail.
+        for content in ["first message", "second message"]:
+            result = self.api_post(
+                bot,
+                "/api/v1/messages",
+                {
+                    "type": "channel",
+                    "to": orjson.dumps("Verona").decode(),
+                    "topic": "from whatsapp",
+                    "content": content,
+                    "client": "jabber_mirror",
+                    "forged": "true",
+                    "sender": sender_email,
+                },
+            )
+            self.assert_json_success(result)
+
+            dummies = UserProfile.objects.filter(realm=realm, delivery_email__iexact=sender_email)
+            self.assert_length(dummies, 1)
+            dummy = dummies[0]
+            # The masked .email is what the old get_user() lookup missed.
+            self.assertNotEqual(dummy.email, dummy.delivery_email)
+            self.assertTrue(dummy.is_mirror_dummy)
+            self.assertFalse(dummy.is_active)
+            self.assertEqual(dummy.full_name, "918299339223")
+
+            message = self.get_last_message()
+            self.assertEqual(message.sender_id, dummy.id)
+            self.assertEqual(message.content, content)
+
+        # Creating the placeholder account must not email anyone.
+        self.assert_length(mail.outbox, outbox_before)
+        self.assertEqual(ScheduledEmail.objects.count(), scheduled_emails_before)
 
     def test_create_mirror_user_despite_race(self) -> None:
         realm = get_realm("zulip")
