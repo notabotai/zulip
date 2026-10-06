@@ -2,6 +2,7 @@ from typing import Any
 from unittest import mock
 
 import orjson
+from django.conf import settings
 from django.core import mail
 from django.db import IntegrityError
 from django.utils.timezone import now as timezone_now
@@ -15,7 +16,7 @@ from zerver.lib.test_helpers import reset_email_visibility_to_everyone_in_zulip_
 from zerver.models import RealmUserDefault, ScheduledEmail, UserProfile
 from zerver.models.clients import get_client
 from zerver.models.realms import get_realm
-from zerver.models.users import get_user
+from zerver.models.users import get_system_bot, get_user
 from zerver.views.message_send import InvalidMirrorInputError, create_mirrored_message_users
 
 
@@ -208,6 +209,15 @@ class MirroredMessageUsersTest(ZulipTestCase):
         # Creating the placeholder account must not email anyone.
         self.assert_length(mail.outbox, outbox_before)
         self.assertEqual(ScheduledEmail.objects.count(), scheduled_emails_before)
+
+    def test_jabber_mirror_cross_realm_bot_sender(self) -> None:
+        """A cross-realm bot's address still resolves to the system bot, not
+        to an account with that address in the forging user's realm."""
+        user = self.example_user("hamlet")
+        mirror_sender = create_mirrored_message_users(
+            get_client("jabber_mirror"), user, [], settings.NOTIFICATION_BOT, "stream"
+        )
+        self.assertEqual(mirror_sender, get_system_bot(settings.NOTIFICATION_BOT, user.realm_id))
 
     def test_create_mirror_user_despite_race(self) -> None:
         realm = get_realm("zulip")
