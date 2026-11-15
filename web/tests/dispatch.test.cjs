@@ -1235,6 +1235,14 @@ run_test("user_settings", ({override}) => {
     assert_same(user_settings.high_contrast_mode, true);
     assert.ok($("body").hasClass("high-contrast"));
 
+    override(user_settings, "nb_theme", "classic");
+    $("body").removeClass("nb-animals");
+    for (const value of ["animals", "classic"]) {
+        dispatch({type: "user_settings", op: "update", property: "nb_theme", value});
+        assert_same(user_settings.nb_theme, value);
+        assert.equal($("body").hasClass("nb-animals"), value === "animals");
+    }
+
     event = event_fixtures.user_settings__web_mark_read_on_scroll_policy;
     override(user_settings, "web_mark_read_on_scroll_policy", 3);
     override(unread_ui, "update_unread_banner", noop);
