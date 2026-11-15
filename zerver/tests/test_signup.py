@@ -2,6 +2,7 @@ import re
 import time
 from collections.abc import Sequence
 from datetime import timedelta
+from email.utils import parseaddr
 from typing import TYPE_CHECKING, Any, Union
 from unittest.mock import MagicMock, patch
 from urllib.parse import quote, urlencode, urlsplit
@@ -3809,8 +3810,9 @@ class TestFindMyTeam(ZulipTestCase):
         from django.core.mail import outbox
 
         self.assert_length(outbox, 2)
-        iago_message = outbox[1]
-        cordelia_message = outbox[0]
+        messages_by_recipient = {parseaddr(message.to[0])[1]: message for message in outbox}
+        iago_message = messages_by_recipient[self.example_email("iago")]
+        cordelia_message = messages_by_recipient[self.example_email("cordelia")]
         self.assertIn("Zulip Dev", iago_message.body)
         self.assertNotIn("Lear & Co", iago_message.body)
         self.assertIn("Zulip Dev", cordelia_message.body)
