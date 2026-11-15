@@ -1690,7 +1690,8 @@ def handle_push_notification(user_profile_id: int, missed_message: dict[str, Any
     missed_message is the event received by the
     zerver.worker.missedmessage_mobile_notifications.PushNotificationWorker.consume function.
     """
-    if not push_notifications_configured() and not settings.NB_WEBPUSH_URL:
+    mobile_push_configured = push_notifications_configured()
+    if not mobile_push_configured and not settings.NB_WEBPUSH_URL:
         return
 
     user_profile = get_user_profile_by_id(user_profile_id)
@@ -1775,7 +1776,7 @@ def handle_push_notification(user_profile_id: int, missed_message: dict[str, Any
                 return
 
     send_nb_webpush(user_profile, message, missed_message["trigger"])
-    if not push_notifications_configured():
+    if not mobile_push_configured:
         return
 
     trigger = missed_message["trigger"]
