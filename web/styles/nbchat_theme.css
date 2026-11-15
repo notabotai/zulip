@@ -1,74 +1,108 @@
-
 /* ---- "Animals (Not a Bot)" theme ---------------------------------------
    Classic Zulip layout, borders made invisible, recolored to the animals-game
    palette (teal #42bdb8 · plum #5c2648 · yellow #fbd868 · coral #d16d56 ·
    peacock-blue #2f8aae). Gated on body.nb-animals (nb_theme = "animals"). ---- */
-body.nb-animals{
-  /* borders → invisible */
-  --color-border-add-subscription-button-focus:transparent;
-  --color-border-brand-banner:transparent;
-  --color-border-compose-content:transparent;
-  --color-border-compose-new-message-button:transparent;
-  --color-border-danger-banner:transparent;
-  --color-border-dropdown-widget:transparent;
-  --color-border-dropdown-widget-button:transparent;
-  --color-border-inbox-folder-component:transparent;
-  --color-border-inbox-search:transparent;
-  --color-border-inbox-search-focus:transparent;
-  --color-border-inbox-search-hover:transparent;
-  --color-border-info-banner:transparent;
-  --color-border-input-pill-image:transparent;
-  --color-border-legacy-input:transparent;
-  --color-border-legacy-input-focus:transparent;
-  --color-border-message-group-spacer-line:transparent;
-  --color-border-pill-container:transparent;
-  --color-border-popover-menu:transparent;
-  --color-border-popover-menu-separator:transparent;
-  --color-border-recent-view-table:transparent;
-  --color-border-rendered-checkbox:transparent;
-  --color-border-rendered-markdown-table:transparent;
-  --color-border-settings-plus-button:transparent;
-  --color-border-sidebar:transparent;
-  --color-border-sidebar-subheader:transparent;
-  --color-border-tab-switcher-ind-tab:transparent;
-  --color-border-table-bordered:transparent;
-  --color-border-table-striped:transparent;
-  --color-border-tip:transparent;
-  --color-border-unread-counter:transparent;
-  --color-border-user-profile-list-container:transparent;
-  --color-border-zulip-button:transparent;
-  --color-border-zulip-button-interactive:transparent;
-  --color-compose-collapsed-reply-button-area-border:transparent;
-  --color-compose-send-button-focus-border:transparent;
-  --color-message-list-border:transparent;
-  --color-markdown-pre-border:transparent;
-  /* palette */
-  --color-background: hsl(220 15% 98%);                 /* subtle near-white canvas */
-  --color-compose-send-button-background:#42bdb8;
-  --color-compose-send-button-background-interactive:#37a49f;
-  --color-unread-marker:#42bdb8;
-  --color-outline-focus:#42bdb8;
-  --color-text-link:#2e8b86;
-  --color-text-link-banner:#2e8b86;
-  --color-background-unread-counter:#42bdb8;
+body.nb-animals {
+    /* borders → invisible */
+    --color-border-add-subscription-button-focus: transparent;
+    --color-border-brand-banner: transparent;
+    --color-border-compose-content: transparent;
+    --color-border-compose-new-message-button: transparent;
+    --color-border-danger-banner: transparent;
+    --color-border-dropdown-widget: transparent;
+    --color-border-dropdown-widget-button: transparent;
+    --color-border-inbox-folder-component: transparent;
+    --color-border-inbox-search: transparent;
+    --color-border-inbox-search-focus: transparent;
+    --color-border-inbox-search-hover: transparent;
+    --color-border-info-banner: transparent;
+    --color-border-input-pill-image: transparent;
+    --color-border-legacy-input: transparent;
+    --color-border-legacy-input-focus: transparent;
+    --color-border-message-group-spacer-line: transparent;
+    --color-border-pill-container: transparent;
+    --color-border-popover-menu: transparent;
+    --color-border-popover-menu-separator: transparent;
+    --color-border-recent-view-table: transparent;
+    --color-border-rendered-checkbox: transparent;
+    --color-border-rendered-markdown-table: transparent;
+    --color-border-settings-plus-button: transparent;
+    --color-border-sidebar: transparent;
+    --color-border-sidebar-subheader: transparent;
+    --color-border-tab-switcher-ind-tab: transparent;
+    --color-border-table-bordered: transparent;
+    --color-border-table-striped: transparent;
+    --color-border-tip: transparent;
+    --color-border-unread-counter: transparent;
+    --color-border-user-profile-list-container: transparent;
+    --color-border-zulip-button: transparent;
+    --color-border-zulip-button-interactive: transparent;
+    --color-compose-collapsed-reply-button-area-border: transparent;
+    --color-compose-send-button-focus-border: transparent;
+    --color-message-list-border: transparent;
+    --color-markdown-pre-border: transparent;
+    /* palette */
+    --color-background: hsl(220deg 15% 98%); /* subtle near-white canvas */
+    --color-compose-send-button-background: hsl(177.561deg 48.2353% 50%);
+    --color-compose-send-button-background-interactive: hsl(
+        177.2477deg 49.7717% 42.9412%
+    );
+    --color-unread-marker: hsl(177.561deg 48.2353% 50%);
+    --color-outline-focus: hsl(177.561deg 48.2353% 50%);
+    --color-text-link: hsl(176.7742deg 50.2703% 36.2745%);
+    --color-text-link-banner: hsl(176.7742deg 50.2703% 36.2745%);
+    --color-background-unread-counter: hsl(177.561deg 48.2353% 50%);
 }
+
 body.nb-animals .sender_name,
-body.nb-animals .message_sender{color:#5c2648 !important;}
-body.nb-animals .unread_count.normal-count{background:#42bdb8 !important;color:#fff !important;}
+body.nb-animals .message_sender {
+    color: hsl(322.2222deg 41.5385% 25.4902%) !important;
+}
+
+body.nb-animals .unread_count.normal-count {
+    background: hsl(177.561deg 48.2353% 50%) !important;
+    color: hsl(0deg 0% 100%) !important;
+}
+
 body.nb-animals #left-sidebar .left-sidebar-title,
 body.nb-animals .left-sidebar-heading,
-body.nb-animals #left-sidebar h4{color:#5c2648 !important;letter-spacing:.04em;}
+body.nb-animals #left-sidebar h4 {
+    color: hsl(322.2222deg 41.5385% 25.4902%) !important;
+    letter-spacing: 0.04em;
+}
+
 body.nb-animals #stream_filters li a:hover,
 body.nb-animals .left-sidebar-navigation-list li a:hover,
-body.nb-animals .narrow-filter:hover{background:#fbd8685c !important;}   /* playful yellow hover */
+body.nb-animals .narrow-filter:hover {
+    background: hsl(45.7143deg 94.8387% 69.6078% / 36.0784%) !important;
+} /* playful yellow hover */
 body.nb-animals .narrow-filter.active-filter,
 body.nb-animals .active-sub-filter,
-body.nb-animals .bottom_left_row.active-filter{background:#42bdb82e !important;color:#5c2648 !important;}
+body.nb-animals .bottom_left_row.active-filter {
+    background: hsl(177.561deg 48.2353% 50% / 18.0392%) !important;
+    color: hsl(322.2222deg 41.5385% 25.4902%) !important;
+}
+
 body.nb-animals .star_container.icon-filled,
-body.nb-animals .zulip-icon-star-filled{color:#f4c430 !important;}
-body.nb-animals .message_reaction.reacted{background:#fbd8683d !important;color:#5c2648 !important;}
-body.nb-animals .user-mention{background:#d16d5626 !important;color:#b34a37 !important;}   /* coral mentions */
+body.nb-animals .zulip-icon-star-filled {
+    color: hsl(45.3061deg 89.9083% 57.2549%) !important;
+}
+
+body.nb-animals .message_reaction.reacted {
+    background: hsl(45.7143deg 94.8387% 69.6078% / 23.9216%) !important;
+    color: hsl(322.2222deg 41.5385% 25.4902%) !important;
+}
+
+body.nb-animals .user-mention {
+    background: hsl(11.2195deg 57.2093% 57.8431% / 14.902%) !important;
+    color: hsl(9.1935deg 52.9915% 45.8824%) !important;
+} /* coral mentions */
 body.nb-animals .private_message_count,
-body.nb-animals .dm-box .unread_count{background:#2f8aae !important;color:#fff !important;} /* peacock-blue DM */
+body.nb-animals .dm-box .unread_count {
+    background: hsl(197.0079deg 57.4661% 43.3333%) !important;
+    color: hsl(0deg 0% 100%) !important;
+} /* peacock-blue DM */
 body.nb-animals a.message_time,
-body.nb-animals .message_time{color:#57777e !important;}
+body.nb-animals .message_time {
+    color: hsl(190.7692deg 18.3099% 41.7647%) !important;
+}

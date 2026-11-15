@@ -366,6 +366,7 @@ class ChangeSettingsTest(ZulipTestCase):
             web_font_size_px=14,
             web_line_height_percent=122,
             color_scheme=2,
+            nb_theme="classic",
             email_notifications_batching_period_seconds=100,
             notification_sound="ding",
             desktop_icon_count_display=2,

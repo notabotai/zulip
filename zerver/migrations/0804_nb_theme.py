@@ -1,7 +1,9 @@
 from django.db import migrations, models
+from django.db.backends.base.schema import BaseDatabaseSchemaEditor
+from django.db.migrations.state import StateApps
 
 
-def set_all_animals(apps, schema_editor):
+def set_all_animals(apps: StateApps, schema_editor: BaseDatabaseSchemaEditor) -> None:
     apps.get_model("zerver", "UserProfile").objects.update(nb_theme="animals")
     apps.get_model("zerver", "RealmUserDefault").objects.update(nb_theme="animals")
 

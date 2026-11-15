@@ -19418,6 +19418,14 @@ paths:
                             description: |
                               This setting is reserved for use to control variations in Zulip's design
                               to help visually impaired users.
+                          nb_theme:
+                            description: |
+                              Web application theme. Choose `classic` for Zulip or `animals` for Not a Bot.
+                            type: string
+                            enum:
+                              - classic
+                              - animals
+                            example: animals
                           web_font_size_px:
                             description: |
                               User-configured primary `font-size` for the web application, in pixels.
@@ -21827,6 +21835,14 @@ paths:
                             description: |
                               This setting is reserved for use to control variations in Zulip's design
                               to help visually impaired users.
+                          nb_theme:
+                            description: |
+                              Web application theme. Choose `classic` for Zulip or `animals` for Not a Bot.
+                            type: string
+                            enum:
+                              - classic
+                              - animals
+                            example: animals
                           web_font_size_px:
                             description: |
                               User-configured primary `font-size` for the web application, in pixels.
@@ -23127,6 +23143,14 @@ paths:
                     the `PATCH /settings/display` endpoint.
                   type: boolean
                   example: true
+                nb_theme:
+                  description: |
+                    Web application theme. Choose `classic` for Zulip or `animals` for Not a Bot.
+                  type: string
+                  enum:
+                    - classic
+                    - animals
+                  example: animals
                 web_font_size_px:
                   description: |
                     User-configured primary `font-size` for the web application, in pixels.

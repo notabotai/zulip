@@ -4786,6 +4786,7 @@ class RealmPropertyActionTest(BaseAction):
             web_font_size_px=[UserProfile.WEB_FONT_SIZE_PX_COMPACT],
             web_line_height_percent=[UserProfile.WEB_LINE_HEIGHT_PERCENT_COMPACT],
             color_scheme=UserProfile.COLOR_SCHEME_CHOICES,
+            nb_theme=["classic", "animals"],
             web_home_view=["recent", "inbox", "all_messages"],
             emojiset=[emojiset["key"] for emojiset in RealmUserDefault.emojiset_choices()],
             demote_inactive_streams=UserProfile.DEMOTE_STREAMS_CHOICES,
@@ -4933,6 +4934,7 @@ class UserDisplayActionTest(BaseAction):
             web_font_size_px=[12, 16, 18],
             web_line_height_percent=[105, 120, 160],
             color_scheme=[2, 3, 1],
+            nb_theme=["classic", "animals"],
             email_address_visibility=[5, 4, 1, 2, 3],
             resolved_topic_notice_auto_read_policy=UserProfile.RESOLVED_TOPIC_NOTICE_AUTO_READ_POLICY_TYPES,
         )

@@ -671,9 +671,7 @@ class FileUploadTest(UploadSerializeMixin, ZulipTestCase):
         self.subscribe(subscriber, "mirror-private")
 
         # The bot uploads the media -> Attachment.owner is the bot, not the member.
-        url, _ = upload_message_attachment(
-            "media.txt", "text/plain", b"mirror-media", mirror_bot
-        )
+        url, _ = upload_message_attachment("media.txt", "text/plain", b"mirror-media", mirror_bot)
         path_id = url.removeprefix("/user_uploads/")
         attachment = Attachment.objects.get(path_id=path_id)
         self.assertEqual(attachment.owner_id, mirror_bot.id)

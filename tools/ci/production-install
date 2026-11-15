@@ -67,6 +67,9 @@ os_info="$(
 # Pin PostgreSQL on Ubuntu 22.04, so we can test upgrading it
 if [ "$os_id $os_version_id" = 'ubuntu 22.04' ]; then
     export POSTGRESQL_VERSION=14
+    # Ensure the CI container's log directory is writable by PostgreSQL.
+    apt-get install -y postgresql-common
+    install -d -o postgres -g postgres -m 1775 /var/log/postgresql
 fi
 
 # Install
