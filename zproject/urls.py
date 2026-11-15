@@ -94,6 +94,7 @@ from zerver.views.navigation_views import (
     remove_navigation_view,
     update_navigation_view,
 )
+from zerver.views.nb_csrf import get_nb_csrf_token
 from zerver.views.onboarding_steps import mark_onboarding_step_as_read
 from zerver.views.presence import (
     get_presence_backend,
@@ -774,6 +775,7 @@ urls: list[URLPattern | URLResolver] = list(i18n_urls)
 urls += [
     path("api/v1/", include(v1_api_and_json_patterns)),
     path("json/", include(v1_api_and_json_patterns)),
+    rest_path("json/nb/csrf", GET=(get_nb_csrf_token, {"intentionally_undocumented"})),
 ]
 
 # user_uploads -> zerver.views.upload.serve_file_backend
