@@ -2805,6 +2805,7 @@ class RealmAPITest(ZulipTestCase):
                 "enable_login_emails",
                 "enable_marketing_emails",
                 "allow_private_data_export",
+                "nb_theme",  # This setting is not exposed by the realm-default endpoint.
             ]:
                 continue
             self.do_test_realm_default_setting_update_api(prop)
@@ -2896,13 +2897,18 @@ class RealmAPITest(ZulipTestCase):
         self.assert_json_error(result, "Invalid resolved_topic_notice_auto_read_policy")
 
     def test_ignored_parameters_in_realm_default_endpoint(self) -> None:
-        params = {"starred_message_counts": orjson.dumps(False).decode(), "emoji_set": "twitter"}
+        params = {
+            "starred_message_counts": orjson.dumps(False).decode(),
+            "emoji_set": "twitter",
+            "nb_theme": "classic",
+        }
         result = self.client_patch("/json/realm/user_settings_defaults", params)
-        self.assert_json_success(result, ignored_parameters=["emoji_set"])
+        self.assert_json_success(result, ignored_parameters=["emoji_set", "nb_theme"])
 
         realm = get_realm("zulip")
         realm_user_default = RealmUserDefault.objects.get(realm=realm)
         self.assertEqual(realm_user_default.starred_message_counts, False)
+        self.assertEqual(realm_user_default.nb_theme, "animals")
 
     def test_update_realm_move_messages_within_stream_limit_seconds_unlimited_value(self) -> None:
         realm = get_realm("zulip")

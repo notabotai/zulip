@@ -939,6 +939,7 @@ class TestRealmAuditLog(ZulipTestCase):
             web_home_view="all_messages",
             emojiset="twitter",
             notification_sound="ding",
+            nb_theme="classic",
             resolved_topic_notice_auto_read_policy=ResolvedTopicNoticeAutoReadPolicyEnum.always,
         )
 
