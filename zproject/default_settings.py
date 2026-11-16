@@ -260,6 +260,7 @@ SESSION_COOKIE_AGE = 60 * 60 * 24 * 7 * 2  # 2 weeks
 
 ZULIP_SERVICES_URL: str | None = "https://push.zulipchat.com"
 ZULIP_SERVICE_PUSH_NOTIFICATIONS = False
+NB_WEBPUSH_URL: str | None = None
 
 # For this setting, we need to have None as the default value, so
 # that we can distinguish between the case of the setting not being
