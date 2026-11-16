@@ -6,6 +6,7 @@ from zerver.lib.test_classes import ZulipTestCase
 class NbCsrfTest(ZulipTestCase):
     def test_session_token_authorizes_post(self) -> None:
         self.login("hamlet")
+        self.assert_json_success(self.client_get("/json/nb/csrf", intentionally_undocumented=True))
         client = Client(enforce_csrf_checks=True)
         client.cookies = self.client.cookies
 
