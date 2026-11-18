@@ -12,6 +12,7 @@ from unittest.mock import MagicMock, patch
 import orjson
 import time_machine
 from django.conf import settings
+from django.db import connection
 from django.db.utils import IntegrityError
 from typing_extensions import override
 
@@ -478,6 +479,46 @@ class WorkerTest(ZulipTestCase):
             "ERROR:root:Failed to process 2 missedmessage_emails for user 10",
             error_logs.output[0],
         )
+
+    def test_missed_message_worker_recovers_from_broken_connection(self) -> None:
+        hamlet = self.example_user("hamlet")
+        message_id = self.send_personal_message(self.example_user("cordelia"), hamlet)
+        ScheduledMessageNotificationEmail.objects.create(
+            user_profile_id=hamlet.id,
+            message_id=message_id,
+            trigger=NotificationTriggers.DIRECT_MESSAGE,
+            scheduled_timestamp=datetime(2021, 1, 1, tzinfo=timezone.utc),
+        )
+
+        mmw = MissedMessageWorker()
+
+        def stop_after_this_loop(check: Callable[[], bool], timeout: float | None) -> bool:
+            mmw.stopping = True
+            return False
+
+        # This test's transaction lives on the real connection, so
+        # close() must put that connection back, not destroy it.
+        closed_connection = connection.get_new_connection(connection.get_connection_params())
+        closed_connection.close()
+        broken = patch.object(connection, "connection", closed_connection)
+        broken.start()
+        self.addCleanup(broken.stop)
+
+        with (
+            patch.object(connection, "close", side_effect=broken.stop),
+            # A second backoff means the retry failed; fail, rather than retry forever.
+            patch.object(mmw.cv, "wait", side_effect=[None, AssertionError("Did not reconnect")]),
+            patch.object(mmw.cv, "wait_for", side_effect=stop_after_this_loop),
+            patch(
+                "zerver.lib.email_notifications.do_send_missedmessage_events_reply_in_zulip"
+            ) as send_mock,
+            self.assertLogs(level="INFO") as logs,
+        ):
+            mmw.work()
+
+        self.assertIn("connection already closed", logs.output[0])
+        send_mock.assert_called_once()
+        self.assertEqual(ScheduledMessageNotificationEmail.objects.count(), 0)
 
     def test_push_notifications_worker(self) -> None:
         """
