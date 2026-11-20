@@ -7,7 +7,7 @@ from typing import Any
 
 import sentry_sdk
 from django.conf import settings
-from django.db import transaction
+from django.db import connection, transaction
 from django.db.utils import IntegrityError
 from django.utils.timezone import now as timezone_now
 from typing_extensions import override
@@ -145,6 +145,10 @@ class MissedMessageWorker(QueueProcessingWorker):
                         "Exception in MissedMessage background worker; restarting the loop",
                         stack_info=True,
                     )
+
+                    # A broken connection stays broken until closed;
+                    # the next query then opens a fresh one.
+                    connection.close()
 
                     # We want to sleep, with backoff, before retrying
                     # the background loop; there may be
