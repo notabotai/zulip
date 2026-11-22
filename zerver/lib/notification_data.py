@@ -3,6 +3,8 @@ from collections.abc import Collection
 from dataclasses import dataclass
 from typing import Any
 
+from django.conf import settings
+
 from zerver.lib.mention import MentionData
 from zerver.lib.user_groups import get_user_group_member_ids
 from zerver.models import NamedUserGroup, UserProfile, UserTopic
@@ -137,6 +139,10 @@ class UserMessageNotificationsData:
             push_device_registered = True
         else:
             push_device_registered = user_id in push_device_registered_user_ids
+        # Web push devices live in the NB_WEBPUSH_URL service, not in Zulip's
+        # device tables; that service filters by its own subscriptions.
+        if settings.NB_WEBPUSH_URL:
+            push_device_registered = True
 
         dm_push_notify = (
             push_device_registered
