@@ -1,3 +1,6 @@
+import os
+from unittest import mock
+
 import orjson
 import responses
 from django.test import override_settings
@@ -16,6 +19,7 @@ from zerver.models.scheduled_jobs import NotificationTriggers
     APNS_CERT_FILE=None,
 )
 class NbWebpushTest(ZulipTestCase):
+    @mock.patch.dict(os.environ, {"HTTP_proxy": "http://localhost:4750"})
     @responses.activate
     def test_dm(self) -> None:
         sender = self.example_user("othello")
@@ -47,6 +51,8 @@ class NbWebpushTest(ZulipTestCase):
                 "snippet": "Hello " + "x" * 194,
             },
         )
+        # The notifier is local, so the hand-off must skip the outgoing proxy.
+        self.assertEqual(responses.calls[0].request.req_kwargs["proxies"], {})  # type: ignore[attr-defined]
 
     @responses.activate
     def test_channel_mention(self) -> None:
