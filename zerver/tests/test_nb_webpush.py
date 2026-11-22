@@ -20,13 +20,16 @@ class NbWebpushTest(ZulipTestCase):
     def test_dm(self) -> None:
         sender = self.example_user("othello")
         recipient = self.example_user("hamlet")
-        message_id = self.send_personal_message(sender, recipient, "**Hello** " + "x" * 220)
         responses.post("http://127.0.0.1:9180/internal/notify", status=200)
+        message_id = self.send_personal_message(sender, recipient, "**Hello** " + "x" * 220)
+        # Fixture users have no push device rows and no event queue, so the
+        # send alone must reach the hand-off.
+        self.assert_length(responses.calls, 1)
 
-        missed_message = {"message_id": message_id, "trigger": NotificationTriggers.DIRECT_MESSAGE}
-        handle_push_notification(recipient.id, missed_message)
         # Reprocessing the queue event must not send a second notification.
-        handle_push_notification(recipient.id, missed_message)
+        handle_push_notification(
+            recipient.id, {"message_id": message_id, "trigger": NotificationTriggers.DIRECT_MESSAGE}
+        )
 
         self.assert_length(responses.calls, 1)
         body = responses.calls[0].request.body
@@ -50,13 +53,9 @@ class NbWebpushTest(ZulipTestCase):
         sender = self.example_user("othello")
         recipient = self.example_user("hamlet")
         self.subscribe(sender, "Denmark")
+        responses.post("http://127.0.0.1:9180/internal/notify", status=200)
         message_id = self.send_stream_message(
             sender, "Denmark", f"@**{recipient.full_name}** hello", topic_name="Greetings"
-        )
-        responses.post("http://127.0.0.1:9180/internal/notify", status=200)
-
-        handle_push_notification(
-            recipient.id, {"message_id": message_id, "trigger": NotificationTriggers.MENTION}
         )
 
         self.assert_length(responses.calls, 1)
@@ -93,49 +92,44 @@ class NbWebpushTest(ZulipTestCase):
 
     @responses.activate
     def test_inaccessible_sender(self) -> None:
+        responses.post("http://127.0.0.1:9180/internal/notify", status=200)
         self.set_up_db_for_testing_user_access()
         sender = self.example_user("hamlet")
         recipient = self.example_user("polonius")
         self.unsubscribe(sender, "test_stream1")
-        message_id = self.send_stream_message(
+        self.send_stream_message(
             sender,
             "test_stream1",
             f"@**{recipient.full_name}** hello",
             allow_unsubscribed_sender=True,
         )
-        responses.post("http://127.0.0.1:9180/internal/notify", status=200)
 
-        handle_push_notification(
-            recipient.id, {"message_id": message_id, "trigger": NotificationTriggers.MENTION}
-        )
-
-        self.assert_length(responses.calls, 1)
-        body = responses.calls[0].request.body
+        # The setup's direct messages hand off first.
+        body = responses.calls[-1].request.body
         assert isinstance(body, bytes)
         self.assertEqual(orjson.loads(body)["sender_full_name"], "Unknown user")
 
     @responses.activate
     def test_read_or_inaccessible_message(self) -> None:
         recipient = self.example_user("hamlet")
+        responses.post("http://127.0.0.1:9180/internal/notify", status=200)
         message_id = self.send_personal_message(self.example_user("othello"), recipient)
+        # Marking it read also clears the active push notification flag.
         UserMessage.objects.filter(user_profile=recipient, message_id=message_id).update(
             flags=UserMessage.flags.read
         )
         missed_message = {"message_id": message_id, "trigger": NotificationTriggers.DIRECT_MESSAGE}
         handle_push_notification(recipient.id, missed_message)
         handle_push_notification(self.example_user("cordelia").id, missed_message)
-        self.assert_length(responses.calls, 0)
+        # Only the send's own hand-off.
+        self.assert_length(responses.calls, 1)
 
     @responses.activate
     def test_notifier_errors(self) -> None:
         recipient = self.example_user("hamlet")
         for error in (ConnectionError("Notifier unavailable"), b""):
             with self.subTest(error=error):
-                message_id = self.send_personal_message(self.example_user("othello"), recipient)
                 responses.post("http://127.0.0.1:9180/internal/notify", body=error, status=500)
                 with self.assertLogs("zerver.lib.nb_webpush", level="WARNING") as logs:
-                    handle_push_notification(
-                        recipient.id,
-                        {"message_id": message_id, "trigger": NotificationTriggers.DIRECT_MESSAGE},
-                    )
+                    self.send_personal_message(self.example_user("othello"), recipient)
                 self.assertIn("Web push hand-off failed", logs.output[0])
